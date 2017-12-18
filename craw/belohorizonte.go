@@ -18,6 +18,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+//Start crawler
 func StartBHCrawler() {
 	log.Info().
 		Msgf("STARTING BELO HORIZONTE CRAWLER")
@@ -50,16 +51,19 @@ func StartBHCrawler() {
 		Msgf("BELO HORIZONTE CRAWLER FINISHED")
 }
 
+//Return the main URL
 func getUrlBH() string {
 	url := "http://portalpbh.pbh.gov.br/pbh/ecp/comunidade.do?evento=portlet&pIdPlc=ecpTaxonomiaMenuPortal&app=acessoinformacao&lang=pt_BR&pg=10125&tax=41984"
 	return url
 }
 
+//Return domain
 func getParsedUrl() string {
 	url := "http://portalpbh.pbh.gov.br"
 	return url
 }
 
+//Scrape main div where there are the XLS files
 func getMainDiv(page *html.Node) *html.Node {
 	matcher := func(n *html.Node) bool {
 		if n.DataAtom == atom.Div && scrape.Attr(n, "id") == "PORTLET_CONTEUDO_0" {
@@ -71,6 +75,7 @@ func getMainDiv(page *html.Node) *html.Node {
 	return mainDiv
 }
 
+//Return an array with all XLS files
 func getSpreadsheetAddress(div *html.Node) []string {
 
 	log.Info().
@@ -91,6 +96,7 @@ func getSpreadsheetAddress(div *html.Node) []string {
 	return spreads
 }
 
+//Extract the information from XLS, transform and store in database
 func extractXls(url string) error {
 	log.Info().
 		Msgf("Status: Downloading XLS file")
@@ -142,6 +148,7 @@ func extractXls(url string) error {
 	return nil
 }
 
+//Convert the salary string to float
 func convertToFloat(val string) (s float64, err error) {
 
 	if val == "" {
@@ -154,6 +161,9 @@ func convertToFloat(val string) (s float64, err error) {
 	return f, nil
 }
 
+//Transform the month and year information in Time format
+//TODO: if the url name change, the getDateTime will fail.
+//TODO: change the function to get in a better way the month info.
 func getDateTime(url string) time.Time {
 	urlSplited := strings.Split(url, "_")
 	month := urlSplited[len(urlSplited)-2]
@@ -173,6 +183,7 @@ func getDateTime(url string) time.Time {
 	return dateTime
 }
 
+//Translate the portuguese month name to number month
 func monthNameToDate(name string) string {
 
 	switch name {

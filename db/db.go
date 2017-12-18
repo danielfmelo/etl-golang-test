@@ -22,6 +22,7 @@ type Env struct {
 	DbName string `json:"dbname"`
 }
 
+//Return the dabase environment from /env/env.json file
 func getEnv() (e Env) {
 
 	file, _ := ioutil.ReadFile("./env/env.json")
@@ -29,12 +30,14 @@ func getEnv() (e Env) {
 	return e
 }
 
+//Create and return the postgres information for the connection
 func getDbinfo() string {
 	d := getEnv()
 	dbinfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", d.User, d.Pass, d.Host, d.Port, d.DbName)
 	return dbinfo
 }
 
+//Initialize database connection
 func InitDB() {
 
 	dbinfo := getDbinfo()
@@ -50,12 +53,14 @@ func InitDB() {
 		Msgf("DATABASE CONNECTION INITIALIZED")
 }
 
+//Close database connection
 func CloseDB() {
 	db.Close()
 	log.Info().
 		Msgf("DATABASE CONNECTION CLOSED")
 }
 
+//Insert new person information
 func InsertPerson(p *utils.Worker) error {
 
 	var lastInsertId int

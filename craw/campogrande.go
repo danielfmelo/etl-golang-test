@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	
+
 	"app/db"
 	"app/utils"
 
@@ -29,6 +29,9 @@ type Payment struct {
 	Discount float64
 }
 
+//Start crawler
+//Get URLs for each agency (orgao)
+//For each URL, find all employees, transform the information and save in database
 func StartCampoGrandeCrawler() {
 	log.Info().
 		Msgf("STARTING CAMPO GRANDE CRAWLER")
@@ -51,6 +54,7 @@ func StartCampoGrandeCrawler() {
 		Msgf("CAMPO GRANDE CRAWLER FINISHED")
 }
 
+//Return an array of URLs changing the "orgao" parameter
 func getAllUrl() []string {
 
 	const AGENCY = 14
@@ -66,6 +70,9 @@ func getAllUrl() []string {
 	return urlArr
 }
 
+//Create and return the URL
+//TODO: change to get for other years and months
+//TODO: change to use the correct length of the array
 func getUrlCG() *url.URL {
 
 	initUrl := new(url.URL)
@@ -80,13 +87,14 @@ func getUrlCG() *url.URL {
 	q.Set("mes", "10")
 	q.Set("ajax", "true")
 	q.Set("start", "0")
-	q.Set("length", "8000")
+	q.Set("length", "80000")
 
 	initUrl.RawQuery = q.Encode()
 
 	return initUrl
 }
 
+//Transform and save information from each employee
 func findAllEmployees(emp [][]string) {
 
 	for i := 0; i < len(emp); i++ {
@@ -120,6 +128,7 @@ func findAllEmployees(emp [][]string) {
 	}
 }
 
+//Get total salary and the discounts (not stored)
 func getSalary(param string) (p *Payment, err error) {
 
 	salaryUrl := getSalaryUrl(param)
@@ -143,6 +152,7 @@ func getSalary(param string) (p *Payment, err error) {
 	return pay, nil
 }
 
+//Transform and save the salary in a struct
 func arrangeSalary(value []string) (pay *Payment, err error) {
 
 	p := new(Payment)
@@ -157,6 +167,7 @@ func arrangeSalary(value []string) (pay *Payment, err error) {
 	return p, nil
 }
 
+//Transform the salary information in float
 func arrangeSalaryString(value string) (val float64, err error) {
 
 	sal := strings.Replace(value, "R$ ", "", -1)
@@ -170,6 +181,7 @@ func arrangeSalaryString(value string) (val float64, err error) {
 	return f, nil
 }
 
+//Scrape salary from HTML
 func getSalaryFromHtml(page *html.Node) []string {
 
 	matcher := func(n *html.Node) bool {
@@ -187,6 +199,7 @@ func getSalaryFromHtml(page *html.Node) []string {
 	return salary
 }
 
+//Scrape salary from HTML
 func getSalaryValue(val *html.Node) string {
 
 	matcher := func(n *html.Node) bool {
@@ -199,6 +212,7 @@ func getSalaryValue(val *html.Node) string {
 	return scrape.Text(salary)
 }
 
+//Salary URL
 func getSalaryUrl(param string) string {
 	return strings.Split(param, "\"")[1]
 }

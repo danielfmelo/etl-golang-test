@@ -13,6 +13,8 @@ type Worker struct {
 	Date   time.Time
 }
 
+//Convert from string to Time
+//Here is seted as default day = 25
 func ConvertToTime(value string) (t time.Time, err error) {
 
 	date := strings.Replace(value, "/", "/25/", -1)
