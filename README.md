@@ -4,7 +4,7 @@ A simple ETL project wrote in GOLANG. The goal of this project is test the skils
 
 ## Getting Started
 
-The project scrape data from public sites and save in a PostgreSQL database. The information scraped is Name, Position and Salary from the employees of two brazilian prefectures.
+The project scrapes data from public sites and save in a PostgreSQL database. The information scraped is Name, Position and Salary from the employees of two brazilian prefectures.
 
 The two prefectures fonts used were: 
 * [PortalPBH](http://portalpbh.pbh.gov.br/pbh/ecp/comunidade.do?evento=portlet&pIdPlc=ecpTaxonomiaMenuPortal&app=acessoinformacao&lang=pt_BR&pg=10125&tax=41984) - Prefeitura Belo Horizonte
@@ -67,8 +67,8 @@ The golang packages used were:
 * [Xls](https://github.com/extrame/xls) - Pure Golang xls library.
 * [Dataparse](https://github.com/araddon/dateparse) - GoLang Parse any date string without knowing format in advance. 
 * [pq](https://github.com/lib/pq) - Pure Go Postgres driver for database/sql. 
-* [Zerolog](https://github.com/lib/pq) - Logger dedicated to JSON output. 
+* [Zerolog](https://github.com/rs/zerolog/) - Logger dedicated to JSON output. 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
