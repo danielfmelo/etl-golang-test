@@ -6,15 +6,13 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
-
+	
 	"app/db"
 	"app/utils"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 
-	"github.com/araddon/dateparse"
 	"github.com/rs/zerolog/log"
 	"github.com/yhat/scrape"
 )
@@ -96,7 +94,7 @@ func findAllEmployees(emp [][]string) {
 		w.Name = emp[i][0]
 		w.Job = emp[i][3]
 
-		date, err := convertToTime(emp[i][1])
+		date, err := utils.ConvertToTime(emp[i][1])
 		if err != nil {
 			log.Info().
 				Err(err).
@@ -113,31 +111,13 @@ func findAllEmployees(emp [][]string) {
 		}
 		w.Salary = s.Salary
 
-		err = persistWorker(w)
+		err = db.InsertPerson(w)
 		if err != nil {
 			log.Info().
 				Err(err).
 				Msgf("ERROR TO PERSIST WORKER: ", w)
 		}
 	}
-}
-
-func persistWorker(w *utils.Worker) error {
-	err := db.InsertPerson(w)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func convertToTime(value string) (t time.Time, err error) {
-
-	date := strings.Replace(value, "/", "/25/", -1)
-	dateTime, err := dateparse.ParseLocal(date)
-	if err != nil {
-		return dateTime, err
-	}
-	return dateTime, nil
 }
 
 func getSalary(param string) (p *Payment, err error) {

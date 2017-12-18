@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"app/utils"
+	"app/db"
 
 	"github.com/extrame/xls"
 	"github.com/rs/zerolog/log"
@@ -132,7 +133,7 @@ func extractXls(url string) error {
 				return err
 			}
 			w.Date = getDateTime(url)
-			err = persistWorker(w)
+			err = db.InsertPerson(w)
 			if err != nil {
 				return err
 			}
@@ -163,7 +164,7 @@ func getDateTime(url string) time.Time {
 
 	date := monthNumber + "/" + year
 
-	dateTime, err := convertToTime(date)
+	dateTime, err := utils.ConvertToTime(date)
 	if err != nil {
 		log.Info().
 			Err(err).
