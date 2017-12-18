@@ -1,0 +1,10 @@
+package: app
+import:
+- package: github.com/yhat/scrape
+- package: golang.org/x/net/html
+- package: golang.org/x/net/html/atom
+- package: github.com/extrame/xls
+- package: github.com/extrame/goyymmdd
+- package: github.com/extrame/ole2
+- package: github.com/araddon/dateparse
+- package: github.com/lib/pq
