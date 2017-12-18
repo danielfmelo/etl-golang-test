@@ -8,3 +8,4 @@ import:
 - package: github.com/extrame/ole2
 - package: github.com/araddon/dateparse
 - package: github.com/lib/pq
+- package: github.com/rs/zerolog/log

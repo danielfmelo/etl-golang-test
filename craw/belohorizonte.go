@@ -2,7 +2,6 @@ package craw
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -12,22 +11,28 @@ import (
 	"app/utils"
 
 	"github.com/extrame/xls"
+	"github.com/rs/zerolog/log"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
 func StartBHCrawler() {
+	log.Info().
+		Msgf("STARTING BELO HORIZONTE CRAWLER")
+
 	url := getUrlBH()
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("ERROR TO GET PAGE")
-		fmt.Println(err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO GET PAGE")
 	}
 	page, err := html.Parse(resp.Body)
 	if err != nil {
-		fmt.Println("ERROR TO PARSE HTML PAGE")
-		fmt.Println(err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO PARSE HTML PAGE")
 	}
 
 	mainDiv := getMainDiv(page)
@@ -36,9 +41,12 @@ func StartBHCrawler() {
 	err = extractXls(spreads[0])
 
 	if err != nil {
-		fmt.Println("ERROR TO EXTRACT XLS")
-		fmt.Println(err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO EXTRACT XLS")
 	}
+	log.Info().
+		Msgf("BELO HORIZONTE CRAWLER FINISHED")
 }
 
 func getUrlBH() string {
@@ -64,6 +72,9 @@ func getMainDiv(page *html.Node) *html.Node {
 
 func getSpreadsheetAddress(div *html.Node) []string {
 
+	log.Info().
+		Msgf("Status: Getting latest XLS reference")
+
 	matcher := func(n *html.Node) bool {
 		if n.DataAtom == atom.A {
 			return true
@@ -80,6 +91,8 @@ func getSpreadsheetAddress(div *html.Node) []string {
 }
 
 func extractXls(url string) error {
+	log.Info().
+		Msgf("Status: Downloading XLS file")
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -87,16 +100,22 @@ func extractXls(url string) error {
 
 	spreadBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO TRANSFORM READER TO BYTES")
 	}
+	log.Info().
+		Msgf("Status: Loading XLS file as Reader")
 	spreadRead := bytes.NewReader(spreadBytes)
-
-	fmt.Printf("%T", spreadRead)
 
 	file, err := xls.OpenReader(spreadRead, "uft-8")
 	if err != nil {
-		fmt.Println(err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO OPEN READER")
 	}
+	log.Info().
+		Msgf("Status: Reading information, transforming and saving in Database")
 	if sheet1 := file.GetSheet(0); sheet1 != nil {
 
 		for i := 7; i <= (int(sheet1.MaxRow)); i++ {
@@ -146,7 +165,9 @@ func getDateTime(url string) time.Time {
 
 	dateTime, err := convertToTime(date)
 	if err != nil {
-		fmt.Println("ERROR TO CONVERT TO TIME ", err)
+		log.Info().
+			Err(err).
+			Msgf("ERROR TO CONVERT TO TIME")
 	}
 	return dateTime
 }

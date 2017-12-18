@@ -5,9 +5,11 @@ import (
 	_ "github.com/lib/pq"
 
 	"app/utils"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"encoding/json"
+
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -29,9 +31,7 @@ func getEnv() (e Env) {
 
 func getDbinfo() string {
 	d := getEnv()
-
 	dbinfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", d.User, d.Pass, d.Host, d.Port, d.DbName)
-	fmt.Println(dbinfo)
 	return dbinfo
 }
 
@@ -45,10 +45,15 @@ func InitDB() {
 		fmt.Println(err)
 		panic(err)
 	}
+
+	log.Info().
+		Msgf("DATABASE CONNECTION INITIALIZED")
 }
 
 func CloseDB() {
 	db.Close()
+	log.Info().
+		Msgf("DATABASE CONNECTION CLOSED")
 }
 
 func InsertPerson(p *utils.Worker) error {
@@ -60,6 +65,5 @@ func InsertPerson(p *utils.Worker) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Inserted person:  %s 				with ID:	%d\n", p.Name, lastInsertId)
 	return nil
 }

@@ -2,7 +2,6 @@ package craw
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,6 +15,7 @@ import (
 	"golang.org/x/net/html/atom"
 
 	"github.com/araddon/dateparse"
+	"github.com/rs/zerolog/log"
 	"github.com/yhat/scrape"
 )
 
@@ -36,17 +36,25 @@ type Payment struct {
 }
 
 func StartCampoGrandeCrawler() {
+	log.Info().
+		Msgf("STARTING CAMPO GRANDE CRAWLER")
+
 	url := getAllUrl()
 	for i := 0; i < len(url); i++ {
+		log.Info().
+			Msgf("Status: Reading information from AGENCY: %d, transforming and saving in Database", i+1)
 		resp, err := http.Get(url[i])
 		if err != nil {
-			fmt.Println("ERROR TO GET PAGE")
-			fmt.Println(err)
+			log.Info().
+				Err(err).
+				Msgf("ERROR TO GET PAGE")
 		}
 		empl := new(Employee)
 		json.NewDecoder(resp.Body).Decode(&empl)
 		findAllEmployees(empl.Data)
 	}
+	log.Info().
+		Msgf("CAMPO GRANDE CRAWLER FINISHED")
 }
 
 func getAllUrl() []string {
@@ -94,21 +102,26 @@ func findAllEmployees(emp [][]string) {
 
 		date, err := convertToTime(emp[i][1])
 		if err != nil {
-			fmt.Println(err)
+			log.Info().
+				Err(err).
+				Msgf("ERROR TO CONVERT TO TIME")
 		}
 		w.Date = date
 
 		salaryUrl := emp[i][6]
 		s, err := getSalary(salaryUrl)
 		if err != nil {
-			fmt.Println(err)
+			log.Info().
+				Err(err).
+				Msgf("ERROR TO GET SALARY")
 		}
 		w.Salary = s.Salary
 
 		err = persistWorker(w)
 		if err != nil {
-			fmt.Println("ERROR PERSIST WORKER: ", w)
-			fmt.Println(err)
+			log.Info().
+				Err(err).
+				Msgf("ERROR TO PERSIST WORKER: ", w)
 		}
 	}
 }
