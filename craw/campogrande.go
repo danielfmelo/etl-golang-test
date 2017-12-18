@@ -19,10 +19,6 @@ import (
 	"github.com/yhat/scrape"
 )
 
-func mockGetUrl() string {
-	return "https://transparencia.campogrande.ms.gov.br/servidores/?action=get_simplificado_JSON&ajax=true&ano=2017&controller=servidores&length=8000&mes=10&orgao=8&start=0"
-}
-
 type Employee struct {
 	Draw            string `json:"draw"`
 	RecordsTotal    int    `json:"recordsTotal"`
